@@ -42,3 +42,5 @@ For an unrelated query:
 ```
 
 Feature branch validation step.
+
+Reproducibility note: rerun build_index.py before launching the API after changing policy documents.
