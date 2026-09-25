@@ -1,0 +1,1 @@
+Predictions after joblib reload on raw rows: [0, 0, 0]
