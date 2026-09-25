@@ -109,10 +109,10 @@ def model(df):
     # Grid search and OOB refit
     grid=GridSearchCV(Pipeline([('preprocess',pre),('model',RandomForestClassifier(random_state=42))]),{'model__n_estimators':[100,200,300],'model__max_depth':[None,5,10],'model__max_features':['sqrt','log2']},cv=5,scoring='f1',n_jobs=-1); grid.fit(Xtr,ytr)
     best_params={k.replace('model__',''):v for k,v in grid.best_params_.items()}; tuned=RandomForestClassifier(oob_score=True,random_state=42,**best_params); final=Pipeline([('preprocess',pre),('model',tuned)]); final.fit(Xtr,ytr); (OUT/'gridsearch.txt').write_text(f'best_params={best_params}\ncv_best_f1={grid.best_score_:.6f}\noob_score={tuned.oob_score_:.6f}\n')
-    # Regression: predict fare from all other available features except fare.
+    # Regression: predict fare from non-target features only.
     reg_features=['survived','pclass','age','sibsp','parch','sex','embarked']
     RX=df[reg_features]; ry=df['fare']; Rtr,Rte,rytr,ryte=train_test_split(RX,ry,test_size=.2,random_state=42)
-    rnum=['survived','pclass','age','sibsp','parch']; rcat=['sex','embarked']; rpre=ColumnTransformer([('num',Pipeline([('imputer',SimpleImputer(strategy='median')),('scaler',StandardScaler())]),rnum),('cat',Pipeline([('imputer',SimpleImputer(strategy='most_frequent')),('onehot',OneHotEncoder(handle_unknown='ignore'))]),rcat)])
+    rnum=['pclass','age','sibsp','parch']; rcat=['sex','embarked']; rpre=ColumnTransformer([('num',Pipeline([('imputer',SimpleImputer(strategy='median')),('scaler',StandardScaler())]),rnum),('cat',Pipeline([('imputer',SimpleImputer(strategy='most_frequent')),('onehot',OneHotEncoder(handle_unknown='ignore'))]),rcat)])
     rp=Pipeline([('preprocess',rpre),('model',LinearRegression())]); rp.fit(Rtr,rytr); pred=rp.predict(Rte); mae=mean_absolute_error(ryte,pred); rmse=mean_squared_error(ryte,pred)**.5; r2=r2_score(ryte,pred); n=len(Rte); p=rp.named_steps['preprocess'].transform(Rte).shape[1]; adj=1-(1-r2)*(n-1)/(n-p-1); pd.DataFrame([{'MAE':mae,'RMSE':rmse,'R2':r2,'Adjusted_R2':adj}]).to_csv(OUT/'regression_metrics.csv',index=False)
     resid=ryte-pred; fig,ax=plt.subplots(); ax.scatter(pred,resid); ax.axhline(0,linestyle='--'); ax.set_xlabel('Predicted fare'); ax.set_ylabel('Residual'); ax.set_title('Fare regression residuals'); fig.tight_layout(); fig.savefig(OUT/'regression_residuals.png'); plt.close(fig)
     # complete end-to-end classifier pipeline persisted

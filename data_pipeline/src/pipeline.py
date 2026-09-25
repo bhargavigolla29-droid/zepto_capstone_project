@@ -20,7 +20,8 @@ RATING_MAP = {"One":1, "Two":2, "Three":3, "Four":4, "Five":5}
 def get_soup(url: str) -> BeautifulSoup:
     response = requests.get(url, timeout=30, headers={"User-Agent":"Mozilla/5.0 capstone-scraper"})
     response.raise_for_status()
-    return BeautifulSoup(response.text, "html.parser")
+    response.encoding = "utf-8"
+    return BeautifulSoup(response.content, "html.parser")
 
 
 def scrape_pages(num_pages: int = 5) -> pd.DataFrame:
@@ -54,7 +55,10 @@ def scrape_pages(num_pages: int = 5) -> pd.DataFrame:
 
 def clean(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
-    out["price_gbp"] = pd.to_numeric(out["price"].str.replace("£", "", regex=False), errors="coerce")
+    out["price_gbp"] = pd.to_numeric(
+        out["price"].astype(str).str.replace(r"[^\d.]", "", regex=True),
+        errors="coerce",
+    )
     out["rating"] = out["star_rating"].map(RATING_MAP)
     out["in_stock"] = out["availability"].str.contains("in stock", case=False, na=False)
     # Numeric parse failures use median; categorical parse failures are dropped because there is
