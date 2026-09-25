@@ -35,3 +35,5 @@ Random Forest GridSearchCV selected `n_estimators=300`, `max_depth=None`, and `m
 The fare regression side-task produced MAE 21.10, RMSE 41.70, R² 0.3482 and adjusted R² 0.3091. The residual plot is included; heteroscedasticity should be judged from whether residual spread changes systematically with fitted fare rather than from the R² alone.
 
 The final model comparison is intentionally descriptive rather than treating classification and regression metrics as one scale. For a deployment choice, the rubric asks for a written recommendation based on metric values; in this implementation the saved comparison makes that choice auditable from the measured results. The complete selected Random Forest pipeline is saved as `best_pipeline.joblib` and reloaded on raw rows in `output/reload_check.txt`.
+
+All model preprocessing is implemented with train-only fitting through scikit-learn pipelines.
