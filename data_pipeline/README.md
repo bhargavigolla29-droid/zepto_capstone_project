@@ -10,3 +10,5 @@ Cleaning decisions:
 - `price_inr = price_gbp * 105.50` exactly; this is the assignment's artificial fixed rate, not a live FX lookup.
 
 The SQLite schema has `categories(category_id)` and `books(category_id)` with a foreign key. Five saved queries cover SELECT/WHERE, ORDER BY, LIMIT, DISTINCT, BETWEEN and JOIN. The join is independently reproduced with `pd.merge`.
+
+Implementation note: generated outputs are supporting artifacts; rerun the module scripts to refresh them.
