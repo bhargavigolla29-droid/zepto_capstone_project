@@ -40,3 +40,7 @@ For an unrelated query:
 ```json
 {"answer":"I can only answer questions about Zepto policies right now.","sources":[],"confidence":1.0}
 ```
+
+Feature branch validation step.
+
+Reproducibility note: rerun build_index.py before launching the API after changing policy documents.
